@@ -1,0 +1,60 @@
+
+# -- Your code here -- #
+from skimage.io import imread,imsave,imshow
+from matplotlib import pyplot as plt
+import numpy as np
+%matplotlib inline
+
+
+
+def put_image(im1,im2,pos_x,pos_y, a) : #on place le logo sur l'image 
+    for x in range(im1.shape[0]):    #on parcourt la longueur et hauteur
+        for y in range(im1.shape[1]):
+            if(im1[x,y]==255):       #quand on a un pixel qui vaut 255, c'est à dire que le pixel est blanc
+                width = pos_x +x     #on peut décider ici où le décaler
+                length = pos_y +y
+                if(a==0):            #si la région est sombre, on place le logo en blanc
+                    im2[width,length]=255
+                else:
+                    im2[width,length]=0 #inversément 
+            
+    return im2
+
+
+def moyenne(im2,im1,pos_x,pos_y): #détérmine la moyenne de la zone de l'image pour voir si c'est clair ou non 
+    luminosity=0
+    n=0
+    for x in range(im1.shape[0]):    #on parcourt la longueur et hauteur
+        for y in range(im1.shape[1]):
+            n+=1 #nombre total de pixel
+            for v in im2[x+pos_x,y+pos_y] :        
+                luminosity +=v/3                     
+    return luminosity/n #sort une moyenne 
+
+
+      
+im1 = imread('watermark.png') #logo ULB à mettre sur une image
+im2 = imread('road.jpg')  
+#si vous mettez x,y = 300 : le logo sera clair
+#si vous mettez x,y = 400 : le logo sera foncé
+pos_x = 400 #mettez n'importe quelle position en x
+pos_y = 400 #idem en y
+
+luminosity = moyenne(im2,im1,pos_x,pos_y) 
+a =0;
+print(luminosity)
+if (luminosity>180): #sur une valeur de 0 à 255, on prend 180 où ça devient clair
+    a=1
+    im3 = put_image(im1,im2,pos_x,pos_y,a) 
+else:
+    a=0
+    im3 = put_image(im1,im2,pos_x,pos_y,a) 
+
+    
+    
+imshow(im3)  
+imsave('watermark_copy.jpg',im3) #on crée une copie de l'image et on la sauvegarde       
+
+
+
+
